@@ -265,32 +265,41 @@ int main(int argc, char *argv[])
         // }
         // cout << endl;
     }
-    // print out
-    // tru positives / (falsepos + tru_pos)
-    // false neg / (false neg + true neg)
     MPI_Finalize();
-    return 0;
-    /*
-    //KNN
-       int queries[20][5] = {
-        {2, 4, 2 , 5},
-        {2, 4, 2 , 5},
-        {2, 4, 2 , 5},
-        {2, 4, 2 , 5},
-        {2, 4, 2 , 5},
-     };
-     results = []
-     for each query
-        results.push(knn(training, query))
-    
-    int KNN(int **matrix, int row, int col, int*a) {
-        int total = 0
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j ++) {
-                total + = abs(matrix[i][j] - a[j])
+     /*
+    False Positive FP/FP+TN
+    False Negative FN/FN+TP
+    True Positive TP/TP+FN
+    True Negative TN/TN+FP
+    */
+    if (rank == 0) {
+        double tp_count = 0;
+        double fn_count = 0;
+        double tn_count = 0;
+        double fp_count = 0;
+        int classification = atoi(argv[3]);
+        for (int i = 0; i < num_queries; i++) {
+            //cout << "actual " << queries[i][classification-1]  << " predictied " << predicted_total[i];
+            if (queries[i][classification-1] == false) {
+                if (queries[i][classification-1] == predicted_total[i]) {
+                    tn_count += 1;
+                } else {
+                    fp_count += 1;
+                }
+            } else if (queries[i][classification-1] == 1) {
+                if (queries[i][classification-1] == predicted_total[i]) {
+                    tp_count +=1; 
+                } else {
+                    fn_count += 1;
+                }
             }
         }
-        return total
+
+        cout << endl;
+        cout << fp_count << " False Postives " << (fp_count/(fp_count+tn_count)) * 100 <<"%" << endl;
+        cout << fn_count <<" False Negatives " << (fn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
+        cout << tp_count <<" True Postives " << (tp_count/(tp_count+fn_count)) * 100 <<"%"  << endl;
+        cout << tn_count <<" True Negatives " << (tn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
     }
-    */
+    return 0;
 }
