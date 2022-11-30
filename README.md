@@ -7,6 +7,8 @@ Johnson Tong jt28@csu.fullerton.edu
 
 Derrick Lee derricklee@csu.fullerton.edu
 
+Miguel Macias miguel6021857@csu.fullerton.edu
+
 Num processes need to be equal or less than number of test points
 
    /*
