@@ -1,4 +1,4 @@
-mpic++ knn.cc -o knn
+mpic++ -std=c++11 knn.cc -o knn
 mpirun -n 3 ./knn 8 10 5 3
 
 # argv[1] = number of queries, argv[2] = number of training instances

@@ -8,8 +8,9 @@
 #include <algorithm>
 #include <bits/stdc++.h>
 #include <utility>
-
+#include <chrono>
 using namespace std;
+//using namespace std::chrono;
 
 // User provides number of training data points and number of query points
 class SortDistances {
@@ -214,6 +215,9 @@ int main(int argc, char *argv[])
         //     cout << predicted_total[i] << " ";
         // }
         // cout << endl;
+        
+        //Clock start 
+        auto process_start = chrono::high_resolution_clock::now();
 
         // start and end
         int start_from_other_process;
@@ -245,6 +249,7 @@ int main(int argc, char *argv[])
                 // cout << received_split[i] << endl;
                 i++;
             }
+
         }
         
         cout <<"totals " << endl;
@@ -252,6 +257,10 @@ int main(int argc, char *argv[])
             cout<< predicted_total[i] << " ";
         }
         cout << endl;
+
+        auto process_stop = chrono::high_resolution_clock::now();
+        auto process_duration = chrono::duration_cast<chrono::microseconds>(process_stop - process_start);
+        cout << "Process took: " << process_duration.count() << " Microseconds" << endl;
         
     }
     else {
