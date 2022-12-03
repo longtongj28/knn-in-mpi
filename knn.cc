@@ -85,8 +85,9 @@ int main(int argc, char *argv[])
          cout << "The number of neighbors must be equal or less than the number of training instances" << endl;
         return -1;
     }
-
-
+     //Starting clock 
+     auto process_start = chrono::high_resolution_clock::now();
+    
      int training[20][5] = {
         {1, 2, 2, 4, 1},
         {1, 2, 2, 2, 0},
@@ -216,9 +217,6 @@ int main(int argc, char *argv[])
         // }
         // cout << endl;
         
-        //Clock start 
-        auto process_start = chrono::high_resolution_clock::now();
-
         // start and end
         int start_from_other_process;
         int end_from_other_process;
@@ -258,9 +256,6 @@ int main(int argc, char *argv[])
         }
         cout << endl;
 
-        auto process_stop = chrono::high_resolution_clock::now();
-        auto process_duration = chrono::duration_cast<chrono::microseconds>(process_stop - process_start);
-        cout << "Process took: " << process_duration.count() << " Microseconds" << endl;
         
     }
     else {
@@ -303,12 +298,16 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        //Stop process and get duration 
+        auto process_stop = chrono::high_resolution_clock::now();
+        auto process_duration = chrono::duration_cast<chrono::microseconds>(process_stop - process_start);
 
         cout << endl;
         cout << fp_count << " False Postives " << (fp_count/(fp_count+tn_count)) * 100 <<"%" << endl;
         cout << fn_count <<" False Negatives " << (fn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
         cout << tp_count <<" True Postives " << (tp_count/(tp_count+fn_count)) * 100 <<"%"  << endl;
         cout << tn_count <<" True Negatives " << (tn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
+        cout <<" Process took: " << process_duration.count() << " Microseconds. " << endl;
     }
     return 0;
 }
