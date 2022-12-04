@@ -10,7 +10,6 @@
 #include <utility>
 #include <chrono>
 using namespace std;
-//using namespace std::chrono;
 
 // User provides number of training data points and number of query points
 class SortDistances {
@@ -46,11 +45,7 @@ int KNN(int training_points[][5],  int query[], int training_row_size, int train
 
     // Sorting each distance_to_index in ascending order with respect to distance
     sort(index_to_distances.begin(), index_to_distances.end(), SortDistances());
-    
-    // for (int i = 0; i < index_to_distances.size(); i++) {
-    //     cout <<  index_to_distances[i].first << " " <<  index_to_distances[i].second<< endl;
-    // }
-
+  
     // Count the number of each class in the k-nearest-neighbors
     map<int, int> all_classes_to_count;
     for (int i = 0; i < k; ++i) {
@@ -161,61 +156,17 @@ int main(int argc, char *argv[])
             total_sum.push_back(total_sum[i-1] + processes_distribution[i]);
         }
     }
-    // 2 1 1
-    // 01 11 22
 
-    // 1 1 2 - proces distribution
-    // 1 2 4 - total sum
-    // 0 1 2
-    // 00 11 23
-    
-    // 0 1 2
-    // 2 3 3
-    // 2 5 8
-    // 01 24 57
-
-    // 2 3 4
-    // 01 2 3
-    // 8 3
-    // 2 2 2
-    // 2 3 3
     start = total_sum[rank]- processes_distribution[rank];
     end = start + processes_distribution[rank] - 1;
 
-    // if (num_queries/((rank+1)*ceiling) > 0) {
-    //     // start and end indices of current process responsibility of queries
-    //     // 0-4 5-9 split_size = 5
-
-    //     start = (rank+1) * ceiling - ceiling;
-    //     end = start + ceiling - 1;
-    // }
-    // else {
-    //     int remainder = ((rank+1)*ceiling)%num_queries;
-    //     int space = ceiling - remainder;
-    
-    //     start = rank * ceiling;
-    //     end = start + space - 1;
-    // }
-    
-    // cout << "From process " << rank << " start: " << start << " end: " << end << endl; 
-    // // MPI_Gather( void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, int root, MPI_Comm communicator)
     int predicted_split[20] = {};
     for (int i = start; i <= end; i++) {
         predicted_split[i - start] = KNN(training, queries[i], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), rank);
         cout << "predicted index is " << i-start << " with " <<  predicted_split[i-start] << endl;
     }
-    // 3 3 2
-    
-    // 2 3 3
-    // Expect 2 to come back, getting 3 back
-    // Expect 3 to come back,
-    // MPI_Gather(&predicted_split, end-start+1, MPI_INT, &predicted_total, end-start+1, MPI_INT, 0, MPI_COMM_WORLD);
+
     if (rank == 0) {
-        // cout << "Predicted from rank 0: " << endl;
-        // for (int i = 0; i < num_queries; ++i) {
-        //     cout << predicted_total[i] << " ";
-        // }
-        // cout << endl;
         
         // start and end
         int start_from_other_process;
@@ -250,7 +201,7 @@ int main(int argc, char *argv[])
 
         }
         
-        cout <<"totals " << endl;
+        cout << "totals " << endl;
         for(int i=0; i < atoi(argv[1]); i++) {
             cout<< predicted_total[i] << " ";
         }
@@ -263,11 +214,6 @@ int main(int argc, char *argv[])
         MPI_Send(&start, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Send(&end, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Send(&predicted_split, end-start+1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-        // cout << "Predicted from other ranks " << rank << endl;
-        //  for (int i = start; i <= end; i++) {
-        //     cout << predicted_split[i-start] << " ";
-        // }
-        // cout << endl;
     }
     MPI_Finalize();
      /*
@@ -283,7 +229,6 @@ int main(int argc, char *argv[])
         double fp_count = 0;
         int classification = atoi(argv[3]);
         for (int i = 0; i < num_queries; i++) {
-            //cout << "actual " << queries[i][classification-1]  << " predictied " << predicted_total[i];
             if (queries[i][classification-1] == false) {
                 if (queries[i][classification-1] == predicted_total[i]) {
                     tn_count += 1;
