@@ -26,7 +26,7 @@ class MostCommonClass {
             return left.second < right.second;
         }
 };
-class File{
+class Instances {
   public:
   int trainingData[20][5];
   int query[20][5];
@@ -67,7 +67,7 @@ int KNN(int training_points[][5],  int query[], int training_row_size, int train
     // cout << "largest class " << largest_class->first << " has " << largest_class->second << endl; 
     return largest_class->first;
 }
-File parser(string fileName){
+File parser(int queries, int instances, int cols,string fileName){
   fstream file;
   string filename = fileName;
   int buffer;
@@ -78,19 +78,21 @@ File parser(string fileName){
   if(file.is_open()){
     cout << "File: " << filename << " has been opened." << endl;
     while(file >> flag){
-      for (int x = 0; x < 10; x++){
-        for (int y = 0; y < 5; y++){
+      for (int x = 0; x < instances; x++){
+        for (int y = 0; y < cols; y++){
           if(file >> buffer){
             parsedData.trainingData[x][y] = buffer;
           }
         }
       }
-      for (int x = 0; x < 8; x++){
-        for (int y = 0; y < 5; y++){
+      for (int x = 0; x < queries; x++){
+        for (int y = 0; y < cols; y++){
           if(file >> buffer){
            parsedData.query[x][y] = buffer;
           }
         }
+        //return parsedData;
+
       }
     }
     file.close();
@@ -124,7 +126,7 @@ int main(int argc, char *argv[])
      //Starting clock 
      auto process_start = chrono::high_resolution_clock::now();
      
-     File file = parser(argv[5]);
+     File file = parser(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),argv[5]);
     
      //int training[20][5] = {file.trainingData};
     
