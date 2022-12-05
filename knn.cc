@@ -67,12 +67,12 @@ int KNN(int training_points[][5],  int query[], int training_row_size, int train
     // cout << "largest class " << largest_class->first << " has " << largest_class->second << endl; 
     return largest_class->first;
 }
-File parser(int queries, int instances, int cols,string fileName){
+Instances parser(int queries, int instances, int cols,string fileName){
   fstream file;
   string filename = fileName;
   int buffer;
   int flag;
-  File parsedData;
+  Instances parsedData;
   file.open(filename, ios::in);
 
   if(file.is_open()){
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
      //Starting clock 
      auto process_start = chrono::high_resolution_clock::now();
      
-     File file = parser(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),argv[5]);
+     Instances file = parser(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),argv[5]);
     
      //int training[20][5] = {file.trainingData};
     
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     */
     if (rank == 0) {
         double tp_count = 0;
-        double fn_count = 0;
+        double fn_count = 0;  
         double tn_count = 0;
         double fp_count = 0;
         int classification = atoi(argv[3]);
