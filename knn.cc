@@ -9,6 +9,8 @@
 #include <bits/stdc++.h>
 #include <utility>
 #include <chrono>
+#include <fstream>
+#include <string>
 using namespace std;
 
 // User provides number of training data points and number of query points
@@ -24,6 +26,12 @@ class MostCommonClass {
             return left.second < right.second;
         }
 };
+class Instances {
+  public:
+  int trainingData[100000][5];
+  int query[100000][5];
+};
+
 int KNN(int training_points[][5],  int query[], int training_row_size, int training_col_size, int k, int rank) {
     // Calculate and store all of the distances between query and data points
     vector<double> neighbor_dists;
@@ -59,9 +67,49 @@ int KNN(int training_points[][5],  int query[], int training_row_size, int train
     // cout << "largest class " << largest_class->first << " has " << largest_class->second << endl; 
     return largest_class->first;
 }
+Instances parser(int queries, int instances, int cols,string fileName){
+  fstream file;
+  string filename = fileName;
+  int buffer;
+  int flag;
+  Instances parsedData;
+  file.open(filename, ios::in);
 
+
+  if(file.is_open()){
+    cout << "File: " << filename << " has been opened." << endl;
+    
+      for (int x = 0; x < instances; x++){
+        for (int y = 0; y < cols; y++){
+          if(file >> buffer){
+            parsedData.trainingData[x][y] = buffer;
+           // cout << parsedData.trainingData[x][y] << " ";
+
+          }
+        }
+        //cout << endl;
+      }
+      for (int x = 0; x < queries; x++){
+        for (int y = 0; y < cols; y++){
+          if(file >> buffer){
+           parsedData.query[x][y] = buffer;
+           //cout << parsedData.query[x][y] << " ";
+          }
+        }
+        cout << endl;
+        
+    }
+    
+    file.close();
+    return parsedData;
+  }else{
+   cout << "File cannot be opened" << endl;  
+  }
+  return parsedData;
+}
 // argv[1] = number of queries, argv[2] = number of training instances
 // argv[3] = number of columns in training instance, argv[4] = how many neighbors
+//argv[5] = filename of test data 
 int main(int argc, char *argv[])
 {
      int rank, size;
@@ -76,38 +124,35 @@ int main(int argc, char *argv[])
     }
 
     // There are more neighbors than training instances
-    if (atoi(argv[4]) > atoi(argv[3])) {
+    if (atoi(argv[4]) > atoi(argv[2])) {
          cout << "The number of neighbors must be equal or less than the number of training instances" << endl;
         return -1;
     }
      //Starting clock 
      auto process_start = chrono::high_resolution_clock::now();
+     
+     Instances file = parser(atoi(argv[1]),atoi(argv[2]),atoi(argv[3]),argv[5]);
+    cout << "------------Instances------------" << endl;
+     for (int x = 0; x < atoi(argv[2]); x ++){
+      for ( int y = 0; y  < atoi(argv[3]); y ++){
+        cout << file.trainingData[x][y] << " ";
+      }
+      cout << endl;
+     }
+     cout << "------------Query------------" << endl;
+     for (int x = 0; x < atoi(argv[1]); x ++){
+      for ( int y = 0; y  < atoi(argv[3]); y ++){
+        cout << file.query[x][y] << " ";
+      }
+      cout << endl;
+     }
     
-     int training[20][5] = {
-        {1, 2, 2, 4, 1},
-        {1, 2, 2, 2, 0},
-        {1, 2, 2, 5, 1},
-        {1, 2, 2, 3, 0},
-        {1, 2, 2, 1, 1},
-        {1, 2, 2, 6, 0},
-        {1, 16, 2, 6, 1},
-        {1, 2, 3, 6, 1},
-        {1, 2, 4, 3, 0},
-        {2, 2, 1, 1, 1}
-     };
     
-     int queries[20][5] = {
-        {2, 1, 2 , 5, 1},
-        {2, 8, 2 , 5, 1},
-        {12, 9, 2 , 5, 0},
-        {2, 4, 2 , 5, 1},
-        {1, 4, 2 , 8, 1},
-        {2, 3, 2 , 5, 0},
-        {13, 4, 2 , 5, 1},
-        {1, 2, 2 , 5, 1},
-     };
+     //int training[20][5] = {file.trainingData};
+    
+     //int queries[20][5] = {file.query};
 
-    int predicted_total[20] = {};
+    int predicted_total[atoi(argv[1])] = {};
 
     int num_queries = atoi(argv[1]);
 
@@ -162,7 +207,7 @@ int main(int argc, char *argv[])
 
     int predicted_split[20] = {};
     for (int i = start; i <= end; i++) {
-        predicted_split[i - start] = KNN(training, queries[i], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), rank);
+        predicted_split[i - start] = KNN(file.trainingData, file.query[i], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), rank);
         cout << "predicted index is " << i-start << " with " <<  predicted_split[i-start] << endl;
     }
 
@@ -224,19 +269,19 @@ int main(int argc, char *argv[])
     */
     if (rank == 0) {
         double tp_count = 0;
-        double fn_count = 0;
+        double fn_count = 0;  
         double tn_count = 0;
         double fp_count = 0;
         int classification = atoi(argv[3]);
         for (int i = 0; i < num_queries; i++) {
-            if (queries[i][classification-1] == false) {
-                if (queries[i][classification-1] == predicted_total[i]) {
+            if (file.query[i][classification-1] == false) {
+                if (file.query[i][classification-1] == predicted_total[i]) {
                     tn_count += 1;
                 } else {
                     fp_count += 1;
                 }
-            } else if (queries[i][classification-1] == 1) {
-                if (queries[i][classification-1] == predicted_total[i]) {
+            } else if (file.query[i][classification-1] == 1) {
+                if (file.query[i][classification-1] == predicted_total[i]) {
                     tp_count +=1; 
                 } else {
                     fn_count += 1;
@@ -245,14 +290,17 @@ int main(int argc, char *argv[])
         }
         //Stop process and get duration 
         auto process_stop = chrono::high_resolution_clock::now();
-        auto process_duration = chrono::duration_cast<chrono::microseconds>(process_stop - process_start);
+        auto process_duration_milliseconds = chrono::duration_cast<chrono::milliseconds>(process_stop - process_start);
+        auto process_duration_seconds = chrono::duration_cast<chrono::seconds>(process_stop - process_start);
 
         cout << endl;
         cout << fp_count << " False Postives " << (fp_count/(fp_count+tn_count)) * 100 <<"%" << endl;
         cout << fn_count <<" False Negatives " << (fn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
         cout << tp_count <<" True Postives " << (tp_count/(tp_count+fn_count)) * 100 <<"%"  << endl;
         cout << tn_count <<" True Negatives " << (tn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
-        cout <<" Process took: " << process_duration.count() << " Microseconds. " << endl;
+        cout <<" Process took: " << process_duration_milliseconds.count() << " Milliseconds. " << endl;
+        cout <<" Process took: " << process_duration_seconds.count() << " seconds. " << endl;
+
     }
     return 0;
 }
