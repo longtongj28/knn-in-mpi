@@ -146,11 +146,6 @@ int main(int argc, char *argv[])
       }
       cout << endl;
      }
-    
-    
-     //int training[20][5] = {file.trainingData};
-    
-     //int queries[20][5] = {file.query};
 
     int predicted_total[atoi(argv[1])] = {};
 
@@ -162,23 +157,6 @@ int main(int argc, char *argv[])
     // Split size for all processes except for last process
     int ceiling = ceil(double(num_queries)/size);
 
-    // 4 queries and 3 processes
-    // 0 1 2 3
-
-    // 1 1 2
-    // 0 1 23
-    
-    // int ceiling = floor(double(num_queries)/size);
-    // 8 / 3 = 2
-    // 8 % 3 = 2 if remain > 1 split with rest of the process otherwise add to end
-    // 4 / 3 = 1, 4 % 3 = 1 add to end or first
-    // 5 / 3 = 1 5 % 3 = 2 add to rest of processes
-
-    // vector where each index represents the process
-    // first for loop add the initial even amount
-    // second for loop to add the remainder
-
-    // 4 queries 3 process
     vector<int> processes_distribution;
     int flooring = num_queries/size;
     for (int i = 0; i < size; i++) {
@@ -224,7 +202,6 @@ int main(int argc, char *argv[])
         }
         // All other ranks' predicted split into predicted_total
         for (int r = 1; r < size; ++r) {
-            //MPI_Recv(&buffer, count, datatype, source, tag, communicator, &status)
             MPI_Recv(&start_from_other_process, 1, MPI_INT, r, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Recv(&end_from_other_process, 1, MPI_INT, r, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
@@ -255,7 +232,6 @@ int main(int argc, char *argv[])
         
     }
     else {
-        //MPI_Send(&buffer, count, datatype, destination, tag, communicator)
         MPI_Send(&start, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Send(&end, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Send(&predicted_split, end-start+1, MPI_INT, 0, 0, MPI_COMM_WORLD);
