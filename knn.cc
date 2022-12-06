@@ -28,8 +28,8 @@ class MostCommonClass {
 };
 class Instances {
   public:
-  int trainingData[20][5];
-  int query[20][5];
+  int trainingData[100000][5];
+  int query[100000][5];
 };
 
 int KNN(int training_points[][5],  int query[], int training_row_size, int training_col_size, int k, int rank) {
@@ -75,28 +75,33 @@ Instances parser(int queries, int instances, int cols,string fileName){
   Instances parsedData;
   file.open(filename, ios::in);
 
+
   if(file.is_open()){
     cout << "File: " << filename << " has been opened." << endl;
-    while(file >> flag){
+    
       for (int x = 0; x < instances; x++){
         for (int y = 0; y < cols; y++){
           if(file >> buffer){
             parsedData.trainingData[x][y] = buffer;
+           // cout << parsedData.trainingData[x][y] << " ";
+
           }
         }
+        //cout << endl;
       }
       for (int x = 0; x < queries; x++){
         for (int y = 0; y < cols; y++){
           if(file >> buffer){
            parsedData.query[x][y] = buffer;
+           //cout << parsedData.query[x][y] << " ";
           }
         }
-        //return parsedData;
-
-      }
+        cout << endl;
+        
     }
+    
     file.close();
-
+    return parsedData;
   }else{
    cout << "File cannot be opened" << endl;  
   }
@@ -119,20 +124,35 @@ int main(int argc, char *argv[])
     }
 
     // There are more neighbors than training instances
-    if (atoi(argv[4]) > atoi(argv[3])) {
+    if (atoi(argv[4]) > atoi(argv[2])) {
          cout << "The number of neighbors must be equal or less than the number of training instances" << endl;
         return -1;
     }
      //Starting clock 
      auto process_start = chrono::high_resolution_clock::now();
      
-     Instances file = parser(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),argv[5]);
+     Instances file = parser(atoi(argv[1]),atoi(argv[2]),atoi(argv[3]),argv[5]);
+    cout << "------------Instances------------" << endl;
+     for (int x = 0; x < atoi(argv[2]); x ++){
+      for ( int y = 0; y  < atoi(argv[3]); y ++){
+        cout << file.trainingData[x][y] << " ";
+      }
+      cout << endl;
+     }
+     cout << "------------Query------------" << endl;
+     for (int x = 0; x < atoi(argv[1]); x ++){
+      for ( int y = 0; y  < atoi(argv[3]); y ++){
+        cout << file.query[x][y] << " ";
+      }
+      cout << endl;
+     }
+    
     
      //int training[20][5] = {file.trainingData};
     
      //int queries[20][5] = {file.query};
 
-    int predicted_total[20] = {};
+    int predicted_total[atoi(argv[1])] = {};
 
     int num_queries = atoi(argv[1]);
 
@@ -270,14 +290,17 @@ int main(int argc, char *argv[])
         }
         //Stop process and get duration 
         auto process_stop = chrono::high_resolution_clock::now();
-        auto process_duration = chrono::duration_cast<chrono::microseconds>(process_stop - process_start);
+        auto process_duration_milliseconds = chrono::duration_cast<chrono::milliseconds>(process_stop - process_start);
+        auto process_duration_seconds = chrono::duration_cast<chrono::seconds>(process_stop - process_start);
 
         cout << endl;
         cout << fp_count << " False Postives " << (fp_count/(fp_count+tn_count)) * 100 <<"%" << endl;
         cout << fn_count <<" False Negatives " << (fn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
         cout << tp_count <<" True Postives " << (tp_count/(tp_count+fn_count)) * 100 <<"%"  << endl;
         cout << tn_count <<" True Negatives " << (tn_count/(fp_count+tn_count)) * 100 <<"%"  << endl;
-        cout <<" Process took: " << process_duration.count() << " Microseconds. " << endl;
+        cout <<" Process took: " << process_duration_milliseconds.count() << " Milliseconds. " << endl;
+        cout <<" Process took: " << process_duration_seconds.count() << " seconds. " << endl;
+
     }
     return 0;
 }
